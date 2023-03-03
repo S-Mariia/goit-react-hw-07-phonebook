@@ -1,45 +1,38 @@
-import {
-  fetchAllContactsRequest,
-  fetchAllContactsSuccess,
-  fetchAllContactsError,
-  deleteContactRequest,
-  deleteContactSuccess,
-  deleteContactError,
-  addContactRequest,
-  addContactSuccess,
-  addContactError,
-} from './contacts-actions';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 import * as api from '../../servises/contacts-api';
 
-export const fetchAllContacts = () => async dispatch => {
-  try {
-    dispatch(fetchAllContactsRequest());
-
-    const contacts = await api.getAllContacts();
-    dispatch(fetchAllContactsSuccess(contacts));
-  } catch (e) {
-    dispatch(fetchAllContactsError(e.message));
+export const fetchContacts = createAsyncThunk(
+  'contacts/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const contacts = await api.getAllContacts();
+      return contacts;
+    } catch (e) {
+      rejectWithValue(e.message);
+    }
   }
-};
+);
 
-export const deleteContact = contactId => async dispatch => {
-  try {
-    dispatch(deleteContactRequest());
-
-    const deletedContact = await api.deleteContact(contactId);
-    dispatch(deleteContactSuccess(deletedContact));
-  } catch (e) {
-    dispatch(deleteContactError(e.message));
+export const deleteContact = createAsyncThunk(
+  'contacts/deleteContact',
+  async (contactId, { rejectWithValue }) => {
+    try {
+      const deletedContact = await api.deleteContact(contactId);
+      return deletedContact;
+    } catch (e) {
+      rejectWithValue(e.message);
+    }
   }
-};
+);
 
-export const addContact = data => async dispatch => {
-  try {
-    dispatch(addContactRequest());
-
-    const newContact = await api.addContact(data);
-    dispatch(addContactSuccess(newContact));
-  } catch (e) {
-    dispatch(addContactError(e.message));
+export const addContact = createAsyncThunk(
+  'contacts/addContact',
+  async (data, { rejectWithValue }) => {
+    try {
+      const newContact = await api.addContact(data);
+      return newContact;
+    } catch (e) {
+      rejectWithValue(e.message);
+    }
   }
-};
+);

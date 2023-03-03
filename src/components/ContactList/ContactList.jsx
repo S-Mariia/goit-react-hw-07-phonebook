@@ -10,7 +10,7 @@ import {
   selectWithError,
 } from 'redux/contacts/contacts-selectors';
 
-import { fetchAllContacts } from 'redux/contacts/contacts-operations';
+import { fetchContacts } from 'redux/contacts/contacts-operations';
 
 export const ContactList = () => {
   const dispatch = useDispatch();
@@ -19,7 +19,7 @@ export const ContactList = () => {
   const error = useSelector(selectWithError);
 
   useEffect(() => {
-    dispatch(fetchAllContacts());
+    dispatch(fetchContacts());
   }, [dispatch]);
 
   return (
