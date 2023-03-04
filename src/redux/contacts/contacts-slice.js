@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import {
   fetchContacts,
   deleteContact,
@@ -11,10 +11,31 @@ const initialState = {
   error: null,
 };
 
-const fetchRequest = state => {
+const extraActions = [fetchContacts, deleteContact, addContact];
+const getActions = type => isAnyOf(...extraActions.map(action => action[type]));
+
+const fetchContactsFulfilledReducer = (state, { payload }) => {
+  state.isLoading = false;
+  state.error = null;
+  state.items = payload;
+};
+
+const addContactFulfilledReducer = (state, { payload }) => {
+  state.isLoading = false;
+  state.error = null;
+  state.items = state.items.filter(({ id }) => id !== payload.id);
+};
+
+const deleteContactFulfilledReducer = (state, { payload }) => {
+  state.isLoading = false;
+  state.error = null;
+  state.items.push(payload);
+};
+
+const anyPendingReducer = state => {
   state.isLoading = true;
 };
-const fetchWithError = (state, action) => {
+const anyRejectedReducer = (state, action) => {
   state.isLoading = false;
   state.error = action.payload;
 };
@@ -22,28 +43,13 @@ const fetchWithError = (state, action) => {
 export const contactsSlice = createSlice({
   name: 'contacts',
   initialState,
-  extraReducers: {
-    [fetchContacts.pending]: fetchRequest,
-    [fetchContacts.fulfilled]: (state, { payload }) => {
-      state.isLoading = false;
-      state.error = null;
-      state.items = payload;
-    },
-    [fetchContacts.rejected]: fetchWithError,
-    [deleteContact.pending]: fetchRequest,
-    [deleteContact.fulfilled]: (state, { payload }) => {
-      state.isLoading = false;
-      state.error = null;
-      state.items = state.items.filter(({ id }) => id !== payload.id);
-    },
-    [deleteContact.rejected]: fetchWithError,
-    [addContact.pending]: fetchRequest,
-    [addContact.fulfilled]: (state, { payload }) => {
-      state.isLoading = false;
-      state.error = null;
-      state.items.push(payload);
-    },
-    [addContact.rejected]: fetchWithError,
+  extraReducers: builder => {
+    builder
+      .addCase(fetchContacts.fulfilled, fetchContactsFulfilledReducer)
+      .addCase(deleteContact.fulfilled, addContactFulfilledReducer)
+      .addCase(addContact.fulfilled, deleteContactFulfilledReducer)
+      .addMatcher(getActions('pending'), anyPendingReducer)
+      .addMatcher(getActions('rejected'), anyRejectedReducer);
   },
 });
 

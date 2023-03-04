@@ -5,10 +5,10 @@ import { ContactItem } from 'components/ContactItem/ContactItem';
 import { Table } from './ContactList.styled';
 
 import {
-  selectFilteredContacts,
   selectIsLoading,
   selectWithError,
 } from 'redux/contacts/contacts-selectors';
+import { selectFilteredContacts } from 'redux/filter/filter-selectors';
 
 import { fetchContacts } from 'redux/contacts/contacts-operations';
 
@@ -26,15 +26,14 @@ export const ContactList = () => {
     <>
       {isLoading && <p>Loading...</p>}
       {error !== null && <p>{error}</p>}
-      {filteredContacts.length > 0 && (
-        <Table>
-          <tbody>
-            {filteredContacts.map(contact => (
-              <ContactItem key={contact.id} item={contact} />
-            ))}
-          </tbody>
-        </Table>
-      )}
+
+      <Table>
+        <tbody>
+          {filteredContacts.map(contact => (
+            <ContactItem key={contact.id} item={contact} />
+          ))}
+        </tbody>
+      </Table>
     </>
   );
 };

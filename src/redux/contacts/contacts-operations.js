@@ -27,12 +27,12 @@ export const deleteContact = createAsyncThunk(
 
 export const addContact = createAsyncThunk(
   'contacts/addContact',
-  async (data, { rejectWithValue }) => {
+  async (data, thunkAPI) => {
     try {
       const newContact = await api.addContact(data);
       return newContact;
     } catch (e) {
-      rejectWithValue(e.message);
+      thunkAPI.rejectWithValue(e.message);
     }
   }
 );
